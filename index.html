@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="x5-orientation" content="portrait">
+<meta name="x5-fullscreen" content="true">
+<meta name="screen-orientation" content="portrait">
+<meta name="full-screen" content="yes">
+<script>
+setSize();
+window.addEventListener("resize",setSize,false);
+window.addEventListener("orientationchange",setSize,false);
+function setSize()
+{
+    var oHtml=document.getElementsByTagName("html")[0];
+    var iWidth=oHtml.getBoundingClientRect().width;
+    oHtml.style.fontSize=iWidth/16+"px";
+}
+</script>
+<title>锤子手机桌面</title>
+<style id="css">
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+html{height:100%;}
+body{
+    margin:0;
+    height:100%;
+    position:relative;
+    overflow:hidden;
+    background:#000;
+}
+header,footer{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    line-height: 40px;
+    color: #fff;
+    background: rgba(0,0,0,.2);
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .8);
+    z-index:3;
+}
+footer {
+    bottom:0;
+    top:auto;
+}
+
+#wrap, #loading {
+    width: 16rem;
+    position: absolute;
+    left: 0;
+    top: 40px;
+    bottom: 40px;
+    -webkit-perspective: 1200px;
+    perspective: 1200px;
+    z-index: 1;
+}
+@keyframes move{
+    0% {
+        transform:rotateY(0deg) rotateX(0deg);
+    }
+    50% {
+        transform:rotateY(0deg) rotateX(-180deg);
+    }
+    100% {
+        transform:rotateY(180deg) rotateX(-180deg);
+    }
+}
+@-webkit-keyframes move{
+    0% {
+        -webkit-transform:rotateY(0deg) rotateX(0deg);
+    }
+    50% {
+        -webkit-transform:rotateY(0deg) rotateX(-180deg);
+    }
+    100% {
+        -webkit-transform:rotateY(180deg) rotateX(-180deg);
+    }
+}
+#loading {
+    -webkit-perspective: 180px;
+    perspective: 180px;
+    z-index:2;
+    background:#000;
+}
+#load {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -50px 0 0 -50px;
+    -webkit-animation: move 1s infinite ease-in-out;
+    animation: move 1s infinite ease-in-out;
+}
+#imgList {
+    width: 16rem;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+#imgList li {
+    width: 4rem;
+    float: left;
+    -webkit-perspective: 300px;
+    perspective: 300px;
+}
+#navs {
+    width: 100%;
+    height: 12px;
+    padding: 10px 0;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, .4);
+    box-shadow: 0 0 5px rgba(255, 255, 255, .7);
+    z-index: 5;
+    text-align: center;
+}
+#navs a {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    display: inline-block;
+    margin: 0 8px;
+    vertical-align: top;
+}
+#navs .active {
+    background: #f90;
+}
+.div {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    position: relative;
+    transform-origin: center center -2rem;
+}
+.div div {
+    width: 4rem;
+    height: 100%;
+    position: absolute;
+    left: 4rem;
+    top: 0;
+    transform-origin: left;
+    transform-style: preserve-3d;
+    transform: rotateY(90deg);
+}
+.div>div {
+    left: 0;
+    transform: rotateY(0deg);
+}
+.div span {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-size:16rem auto;
+}
+</style>
+<script src="js/startMove.js"></script>
+<script src="js/touch.js"></script>
+<script>
+var imgUrls=["img/img1.jpeg","img/img2.jpeg","img/img3.jpeg","img/img4.jpeg"];
+function id(idName) {
+        return document.getElementById(idName);
+}
+window.onload=function() {
+    setLayout();
+    var list=id("imgList");
+    var boxs=list.getElementsByClassName("div");
+    var now=0;
+    var timer=0;
+    var off=false;
+    $(list).swipeLeft(
+        function (){
+            if(off)
+            {
+                return;
+            }
+            off=true;
+            now++;
+            var i=0;
+            clearInterval(timer);
+            timer=setInterval(
+                function (){
+                    if(i==3)
+                    {
+                        clearInterval(timer);
+                    }
+                    tabImg(i,-1);
+                    i++;
+                },
+                30
+            );
+            tabNav();
+        }
+    );
+    $(list).swipeRight(
+        function (){
+            if(off)
+            {
+                return;
+            }
+            off=true;
+            now--;
+            var i=0;
+            clearInterval(timer);
+            timer=setInterval(
+                function (){
+                    if(i==3)
+                    {
+                        clearInterval(timer);
+                    }
+                    tabImg(i,1);
+                    i++;
+                },
+                30
+            );
+            tabNav();
+        }
+    );
+    // 设置图片的显示效果。
+    function tabImg(rows,dis){
+        var timer2=0;
+        var start= dis>0? rows*4 : (rows+1)*4-1;
+        var end= dis>0?  (rows+1)*4-1 : rows*4;
+        timer2=setInterval(
+            function() {
+                if(start == end)
+                {
+                    clearInterval(timer2);
+                }
+                if(rows==3 && start == end)
+                {
+                    mTween(boxs[start],{rotateY:-90*now},600,"backOut",
+                        function (){
+                            off=false;
+                        }
+                    );
+                }
+                else
+                {
+                    mTween(boxs[start],{rotateY:-90*now},600,"backOut");
+                }
+                start+=dis;
+            },
+            60
+        );
+    }
+    // 封装函数当前对应的位置高亮
+    function tabNav(){
+        var navs=id("navs").children;
+        var nub=now%navs.length;
+        if(nub<0){
+            nub+=navs.length;
+        }
+        for(var i=0; i<navs.length; i++){
+            navs[i].className="";
+        }
+        navs[nub].className="active";
+    }
+};
+// 将图片切成16份显示
+function setLayout(){
+    var list=id("imgList");
+    var li=list.getElementsByTagName("li");
+    var css=id("css");
+    var str='';
+    var listH=list.clientHeight;
+    var liH=listH/4;
+    for( var i=0; i<16; i++){
+        str+='<li><div class="div"><div><span></span><div><span></span><div><span></span><div><span></span></div></div></div></div></div></li>'
+    }
+    list.innerHTML=str;
+    css.innerHTML+="#imgList li{height:"+liH+"px}";
+    for(var i=0; i<li.length; i++){
+        var span=li[i].getElementsByTagName("span");
+        for(var j=0; j<span.length; j++){
+            span[j].style.backgroundImage="url("+imgUrls[j]+")";
+            span[j].style.backgroundPosition=-(i%4)*4+"rem -"+parseInt(i/4)*liH+"px";
+        }
+    }
+}
+</script>
+</head>
+<body>
+<header>3D场景切换</header>
+<div id="loading" style="display:none;">
+    <div id="load"></div>
+</div>
+<div id="wrap">
+    <ul id="imgList">
+    </ul>
+    <nav id="navs">
+        <a href="javascript:;" class="active"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+    </nav>
+</div>
+<footer>锤子手机的桌面切换</footer>
+</body>
+</html>
